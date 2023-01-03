@@ -1,0 +1,379 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dashboard_name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the dashboard"
+      }
+    },
+    "la_id": {
+      "type": "string",
+      "metadata": {
+        "description": "ID of the Log Analytics instance"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location in which the resources should be deployed."
+      }
+    }
+  },
+  "resources": [
+    {
+      "name": "[parameters('dashboard_name')]",
+      "type": "Microsoft.Portal/dashboards",
+      "apiVersion": "2015-08-01-preview",
+      "location": "[parameters('location')]",
+      "tags": {
+        "hidden-title": "[parameters('dashboard_name')]"
+      },
+      "properties": {
+        "lenses": {
+          "0": {
+            "order": 0,
+            "parts": {
+              "0": {
+                "position": {
+                  "x": 0,
+                  "y": 0,
+                  "colSpan": 7,
+                  "rowSpan": 5
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "resourceTypeMode",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ComponentId",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Scope",
+                      "value": {
+                        "resourceIds": [
+                          "[parameters('la_id')]"
+                        ]
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartId",
+                      "value": "1c1f9178-d2bc-4a94-a911-6865b14c19b2",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Version",
+                      "value": "2.0",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "TimeRange",
+                      "value": "P1D",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "DashboardId",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "DraftRequestParameters",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Query",
+                      "value": "AppTraces \n | extend ParsedProperties = parse_json(Properties)\n | extend BusinessObjectName = tostring(ParsedProperties.business_object_name)\n | extend AssignmentGroup = ParsedProperties.assignment_group\n | extend Priority = ParsedProperties.priority\n | extend Result = tobool(ParsedProperties.validation_successful)\n | extend Description = ParsedProperties.validation_description\n | summarize Success=countif(Result), Failure=countif(Result == false) by BusinessObjectName | order by BusinessObjectName asc \n\n",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ControlType",
+                      "value": "AnalyticsGrid",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "SpecificChart",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Validation result summary",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartSubTitle",
+                      "value": "Lists the results per business object for the selected timeframe",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Dimensions",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "LegendOptions",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "IsQueryContainTimeRange",
+                      "value": false,
+                      "isOptional": true
+                    }
+                  ],
+                  "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+                  "settings": {}
+                }
+              },
+              "1": {
+                "position": {
+                  "x": 0,
+                  "y": 5,
+                  "colSpan": 14,
+                  "rowSpan": 5
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "resourceTypeMode",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ComponentId",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Scope",
+                      "value": {
+                        "resourceIds": [
+                          "[parameters('la_id')]"
+                        ]
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartId",
+                      "value": "1c1f9178-d2bc-4a94-a911-6865b14c19b2",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Version",
+                      "value": "2.0",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "TimeRange",
+                      "value": "P1D",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "DashboardId",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "DraftRequestParameters",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Query",
+                      "value": "AppTraces | extend Properties = parse_json(Properties) | extend BusinessObjectName = tostring(Properties.business_object_name) | extend AssignmentGroup = tostring(Properties.assignment_group) | extend Priority = toint(Properties.priority) | extend Result = tobool(Properties.validation_successful) | extend Description = tostring(Properties.validation_description) | extend TimeStamp = tostring(Properties.timestamp) | extend NotenbookUrl = tostring(Properties.notebook_url) | where Result == False | order by BusinessObjectName asc, Priority asc | project BusinessObjectName, Priority, TimeStamp, AssignmentGroup, Description, NotenbookUrl \n\n",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ControlType",
+                      "value": "AnalyticsGrid",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "SpecificChart",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Validation failure details",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartSubTitle",
+                      "value": "List the details of failed validations for the selected timeframe",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Dimensions",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "LegendOptions",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "IsQueryContainTimeRange",
+                      "value": false,
+                      "isOptional": true
+                    }
+                  ],
+                  "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+                  "settings": {}
+                }
+              },
+              "2": {
+                "position": {
+                  "x": 7,
+                  "y": 0,
+                  "colSpan": 7,
+                  "rowSpan": 5
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "resourceTypeMode",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ComponentId",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Scope",
+                      "value": {
+                        "resourceIds": [
+                          "[parameters('la_id')]"
+                        ]
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartId",
+                      "value": "1159f315-11fa-45c6-9af1-3a2ac65042ec",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Version",
+                      "value": "2.0",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "TimeRange",
+                      "value": "P1D",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "DashboardId",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "DraftRequestParameters",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Query",
+                      "value": "AppTraces\n| extend Properties = parse_json(Properties)\n| extend BusinessObjectName = tostring(Properties.business_object_name)\n| extend Result = tobool(Properties.validation_successful)\n| extend EventTime = todatetime(Properties.timestamp)\n| summarize Failure=countif(Result == false), Success=countif(Result) by bin(EventTime, 1d)\n| order by bin(EventTime, 1d) asc\n",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ControlType",
+                      "value": "FrameControlChart",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "SpecificChart",
+                      "value": "StackedColumn",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Analytics",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "PartSubTitle",
+                      "value": "Trend of failure and success for last period",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "Dimensions",
+                      "value": {
+                        "xAxis": {
+                          "name": "EventTime",
+                          "type": "datetime"
+                        },
+                        "yAxis": [
+                          {
+                            "name": "Failure",
+                            "type": "long"
+                          },
+                          {
+                            "name": "Success",
+                            "type": "long"
+                          }
+                        ],
+                        "splitBy": [],
+                        "aggregation": "Sum"
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "LegendOptions",
+                      "value": {
+                        "isEnabled": true,
+                        "position": "Bottom"
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "IsQueryContainTimeRange",
+                      "value": false,
+                      "isOptional": true
+                    }
+                  ],
+                  "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+                  "settings": {},
+                  "partHeader": {
+                    "title": "Trend",
+                    "subtitle": ""
+                  }
+                }
+              }
+            }
+          }
+        },
+        "metadata": {
+          "model": {
+            "timeRange": {
+              "value": {
+                "relative": {
+                  "duration": 24,
+                  "timeUnit": 1
+                }
+              },
+              "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+            },
+            "filterLocale": {
+              "value": "en-us"
+            },
+            "filters": {
+              "value": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "utc",
+                    "granularity": "auto",
+                    "relative": "24h"
+                  },
+                  "displayCache": {
+                    "name": "UTC Time",
+                    "value": "Past 24 hours"
+                  },
+                  "filteredPartIds": [
+                    "StartboardPart-LogsDashboardPart-1329ddb3-e2a5-4580-be45-d7f1b05ab009"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

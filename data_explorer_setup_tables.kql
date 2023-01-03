@@ -1,0 +1,74 @@
+.create table thor_streaming_logs ( 
+    timestamp:datetime, 
+    job_type:string, 
+    opco:string, 
+    department:string, 
+    datastore:string, 
+    dataset:string, 
+    num_ingested_rows:int, 
+    approximate_queue_size:int, 
+    job_run_id: int
+)
+
+.alter-merge table thor_streaming_logs (
+    exceptions:string,
+    is_live_datafeed:bool
+) 
+
+
+.create table thor_dataset_stats (
+    opco: string, 
+    scan_datetime: datetime, 
+    layer: string, 
+    zone: string, 
+    location: string, 
+    department: string, 
+    datastore: string, 
+    dataset: string, 
+    num_files: int, 
+    row_count: long, 
+    size_gb: double, 
+    last_modified: datetime
+) 
+
+.create table thor_maintenance_logs ( 
+    timestamp: datetime, 
+    job_type: string, 
+    opco: string, 
+    job_run_id: int,
+    zone: string,
+    location: string,
+    department: string, 
+    datastore: string, 
+    dataset: string, 
+    action: string,
+    success: bool,
+    duration: timespan
+)
+
+.create table thor_job_runs (
+    opco: string, 
+    run_id: long, 
+    original_attempt_run_id: long, 
+    run_name: string, 
+    job_type: string, 
+    feed_name: string, 
+    state: string, 
+    start_time: datetime, 
+    end_time: datetime, 
+    attempt_number: int, 
+    run_page_url: string     
+)
+
+.create table thor_datasource_metadata(    
+    opco: string,
+    opco_abbr: string,
+    env_abbr: string,
+    datastore: string, 
+    dataset: string, 
+    ['metadata']: dynamic, 
+    source: dynamic, 
+    destination: dynamic,        
+    ['schema']: dynamic,
+    timestamp: datetime
+)

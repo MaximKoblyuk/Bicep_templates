@@ -1,0 +1,50 @@
+.create table dqf_validation_events (
+    timestamp:datetime,
+    result_status:string,
+    result_message:string,
+    result_metrics:dynamic,
+    validator_name:string,
+    validator_type:string,
+    target_id:string,
+    target_platform:string,
+    target_opco:string,
+    target_env:string,
+    target_datastore:string,
+    target_dataset:string,
+    target_layer:string,
+    target_zone:string,
+    tags:dynamic
+)
+
+.create-or-alter function forDayRange(T1:(*), start:datetime, end:datetime, step:timespan=1d) {
+    (range day from startofday(start) to end step step | extend j_='dummy')
+    | join kind=fullouter
+        (T1 | extend j_='dummy')
+        on j_
+    | project-away j_, j_1
+}
+
+.create-or-alter function internalValidationResults(opco_arg:string, env_arg:string, start:datetime, end:datetime) {
+    let dqf_raw_events = () { 
+        database('dqf-cf2-metrics').dqf_validation_events
+        | where target_opco==opco_arg and target_env==env_arg and target_layer=='raw' and validator_type == 'internal'
+        | extend day=(startofday(timestamp))
+        | summarize arg_max(timestamp, *) by day, target_id
+    };
+    (forDayRange(database('thor-cf2-metrics').thor_datasource_metadata, start, end) | where opco==strcat(opco_arg, '-', env_arg))
+    | join kind=leftouter (
+        dqf_raw_events
+    ) on day, $left.datastore==$right.target_datastore, $left.dataset==$right.target_dataset
+    | extend result=case(
+        isnull(source), "UNDEFINED",
+        schema=='{}' or isempty(destination.frequency), "DISABLED",
+        isempty(result_status), "CRASH",
+        result_status)
+}
+
+.create-or-alter function internalValidationCounts(opco_arg:string, env_arg:string, start:datetime, end:datetime) {
+    internalValidationResults(opco_arg, env_arg, start, end)
+    | summarize c=count() by day, result
+    | evaluate pivot(result, sum(c)):(day:datetime, PASS:long, WARN:long, FAIL:long, ERROR:long, UNDEFINED:long, DISABLED:long, CRASH:long)
+    | extend TOTAL=PASS+WARN+FAIL+ERROR+UNDEFINED+DISABLED+CRASH
+}
